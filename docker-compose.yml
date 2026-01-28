@@ -15,7 +15,6 @@ services:
 
   django_app:
     image: "mallesham21/notes-app"
-    image: django_app
     container_name: "django_cont"
     ports:
       - "8000:8000"
