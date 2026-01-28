@@ -16,5 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app/backend
 
 EXPOSE 8000
+https://github.com/Mallesham21/django-notes-app.git
 #RUN python manage.py migrate
 #RUN python manage.py makemigrations
