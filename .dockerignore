@@ -1,0 +1,6 @@
+data/
+mysql/
+db/
+*.log
+node_modules/
+.git
