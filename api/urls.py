@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from api import views
 
 urlpatterns = [
     path('', getRoutes, name="routes"),
@@ -8,4 +9,7 @@ urlpatterns = [
     path('notes/<str:pk>/delete/', deleteNote, name="delete-note"),
     path('notes/create/', createNote, name="create-note"),
     path('notes/<str:pk>/', getNote, name="note"),
+    # urls.py
+    path('github-webhook/', views.github_webhook)
+
 ]
