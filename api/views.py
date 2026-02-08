@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import NoteSerializer
@@ -16,7 +17,7 @@ def getRoutes(request):
             'description': 'Returns an array of notes'
         },
         {
-            'Endpoint': '/notes/id',
+            'Endpoint': '/notes/<id>/',
             'method': 'GET',
             'body': None,
             'description': 'Returns a single note object'
@@ -28,16 +29,16 @@ def getRoutes(request):
             'description': 'Creates new note with data sent in post request'
         },
         {
-            'Endpoint': '/notes/id/update/',
+            'Endpoint': '/notes/<id>/update/',
             'method': 'PUT',
             'body': {'body': ""},
-            'description': 'Creates an existing note with data sent in post request'
+            'description': 'Updates an existing note with data sent in the request'
         },
         {
-            'Endpoint': '/notes/id/delete/',
+            'Endpoint': '/notes/<id>/delete/',
             'method': 'DELETE',
             'body': None,
-            'description': 'Deletes and exiting note'
+            'description': 'Deletes an existing note'
         },
     ]
     return Response(routes)
@@ -50,29 +51,32 @@ def getNotes(request):
 
 @api_view(['GET'])
 def getNote(request, pk):
-    note = Note.objects.get(id=pk)
+    note = get_object_or_404(Note, id=pk)
     serializer = NoteSerializer(note, many=False)
     return Response(serializer.data)
 
 @api_view(['PUT'])
 def updateNote(request, pk):
-    note = Note.objects.get(id=pk)
-    serializer = NoteSerializer(instance=note, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
+    note = get_object_or_404(Note, id=pk)
+    serializer = NoteSerializer(instance=note, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
     return Response(serializer.data)
 
 @api_view(['DELETE'])
 def deleteNote(request, pk):
-    note = Note.objects.get(id=pk)
+    note = get_object_or_404(Note, id=pk)
     note.delete()
-    return Response('Note was deleted!')
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
 def createNote(request):
-    data = request.data
-    note = Note.objects.create(
-        body=data['body']
-    )
-    serializer = NoteSerializer(note, many=False)
-    return Response(serializer.data)
+    serializer = NoteSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def github_webhook(request):
+    return Response({'status': 'ok'})
